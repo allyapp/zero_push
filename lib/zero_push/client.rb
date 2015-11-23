@@ -3,12 +3,11 @@ require 'faraday_middleware'
 
 module ZeroPush
   class Client
-    URL = 'https://api.zeropush.com'.freeze
+    attr_accessor :auth_token, :api_url
 
-    attr_accessor :auth_token
-
-    def initialize(auth_token)
+    def initialize(auth_token, api_url = 'https://api.zeropush.com')
       self.auth_token = auth_token
+      self.api_url    = api_url
       self.extend(Compatibility)
     end
 
@@ -251,7 +250,7 @@ module ZeroPush
 
     # Instantiate a new http client configured for making requests to the API
     def http
-      Faraday.new(url: URL) do |c|
+      Faraday.new(url: self.api_url) do |c|
         c.token_auth self.auth_token
         c.request    http_config[:request_encoding]
         c.response   :json, :content_type => /\bjson$/ # parse responses to JSON
